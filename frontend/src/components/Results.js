@@ -2,6 +2,7 @@ import React from 'react';
 import axios from "axios";
 import { useState, useEffect } from 'react';
 import Search from './Search';
+import SearchItem from './SearchItem';
 
 
 function Results({search,query,setQuery}) {
@@ -25,7 +26,7 @@ function Results({search,query,setQuery}) {
             {console.log(post)}
             <ol>
                 {post.map((x)=>{
-                    return <div><l1><a href={x[0]}>{x[2]}</a></l1></div>
+                    return <div><li><a href={x[0]}>{x[2]}</a></li></div>
                 })}
             </ol>
         </div>
