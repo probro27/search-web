@@ -52,8 +52,8 @@ const app= express();
 const port = process.env.PORT || 5000; 
 
 // const uri = process.env.ATLAS_URI; 
-// const uri = "mongodb+srv://admin:password1234$@web-map.qzzvr.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
-const uri = "mongodb://localhost:27017/"
+const uri = "mongodb+srv://admin:password1234$@web-map.qzzvr.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
+// const uri = "mongodb://localhost:27017/"
 const words = ['python']
 
 const MongoClient = require('mongodb').MongoClient;
@@ -146,8 +146,8 @@ async function getData (clients, lst, db1, db2, res,pg) {
         // Runs 5 times, with values of step 0 through 4.
         if ((step*pg) < len) {
             const val = finalResults[step*pg]
-            const title = await getTitle(val[0])
-            final.push([val[0],val[1],title])
+            // const title = await getTitle(val[0])
+            final.push([val[0],val[1]])
 
         }}
     // console.log(getTitle(''))
