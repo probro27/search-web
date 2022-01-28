@@ -14,7 +14,7 @@ async function getTitle(url) {
   const $ = cheerio.load(body);
   const title = $("head > title").text().trim();
   console.log(title);
-  greturn title;
+  return title;
   };
 
   
