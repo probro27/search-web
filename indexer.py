@@ -34,25 +34,18 @@ def tagparse(data,priority):
     try:
         for i in data:
             for j in i.text.strip().split(' '):
-
                 j = re.sub('[%s]' % re.escape(string.punctuation), '', j)
                 if len(j) >= 2 and len(j) <=45:
-
                     if lst_tags.get(j.lower()):
                         x = (lst_tags[j.lower()]/priority) + 1
                         lst_tags[j.lower()] = x*priority
                     else:
                         lst_tags[j.lower()] = priority
-                        
                 else:
                     pass
-        # print(lst_tags)
         return lst_tags
-
     except:
         return None
-
-
 
 def bodyClean(body):
     body = str(body)
@@ -70,12 +63,8 @@ def bodyClean(body):
     doc = doc.split()
     doc = [lemmatizer.lemmatize(word) for word in doc if not word in set(stopwords)]
     doc = ' '.join(doc)
-
     pprint(doc)
     return doc
-
-
-
 
 def htmlparser(soup, url):
     print(soup.findAll('title'))
@@ -87,9 +76,8 @@ def htmlparser(soup, url):
     
     for i in priorities:
         for key, value in i.items():
-            # print(key)
             db.tags.update_one(
                 filter= { "word": key },
                 update= { "$addToSet": { str(math.ceil(value/10)) : url}},
                 upsert=True,
-                )
+            )
