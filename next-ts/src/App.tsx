@@ -11,7 +11,7 @@ import Home from "./components/home";
 // import About component
 import Search from "./components/search";
 // import ContactUs component
-// import RequestCrawl from "./Components/requestCrawl";
+import RequestCrawl from "./components/requestCrawl";
 function App() {
 return (
 	<>
@@ -31,7 +31,7 @@ return (
 		{/* This route is for contactus component
 		with exact path "/contactus", in
 		component props we passes the imported component*/}
-		{/* <Route path="/request/crawl" component={RequestCrawl} /> */}
+		<Route path="/request/crawl" component={RequestCrawl} />
 			
 		{/* If any route mismatches the upper
 		route endpoints then, redirect triggers

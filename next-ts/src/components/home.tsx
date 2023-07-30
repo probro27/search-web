@@ -27,25 +27,20 @@ function Home() {
           onChange={(e) => onChange(e)}
         ></input>
         <div className="flex flex-row justify-around">
-          <button
-              className="bg-blue-300 w-1/3 px-4 py-3 text-xl text-gray-700 rounded-md hover:bg-blue-500 duration-500 hover:text-white"
-              type="submit"
-              >
-            <Link 
+            <Link  className="bg-blue-300 w-1/3 px-4 py-3 text-xl text-gray-700 rounded-md hover:bg-blue-500 duration-500 hover:text-white"
+
               to={{ pathname: `/search`, state: { query: query } }} // add page number
             >
               Search Now!
             </Link>
-          </button>
           
-          <button
-            className="bg-blue-300 w-1/3 px-4 py-3 text-xl text-gray-700 rounded-md hover:bg-blue-500 duration-500 hover:text-white"
-            type="submit"
-            value="Submit"
-            onClick={(e) => onRecrawlRequest(e)}
+
+          <Link
+           className="bg-blue-300 w-1/3 px-4 py-3 text-xl text-gray-700 rounded-md hover:bg-blue-500 duration-500 hover:text-white"
+          to = {{pathname: `/request/crawl`}}
           >
-            Recrawl URL!
-          </button>
+            Request Crawl
+          </Link>
         </div>
         
       </form>
