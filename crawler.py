@@ -43,53 +43,12 @@ for i in root_url:
 
 
 
-
 start_time = time.time()
 seconds = 120
 words = dict()
 
 
-def check(url):
-    global unique
-    if is_valid_url(url):
-        link = urlparse(url)
-        domain = link.netloc
-        host = link.path
-        if unique.get(domain):
-            try:
-                unique[domain][host] +=1
-                unique[domain]['__0__']+=1
-                x = unique[domain]['__0__']
-                if x > 10:
-                    if x%200 == 0:
-                        changes.put([domain, unique[domain]['__0__'], "upd"])
-                    elif x<200 and x%20 == 0:
-                        changes.put([domain, unique[domain]['__0__'], "upd"])
-                else:
-                    changes.put([domain, unique[domain]['__0__'], "upd"])
-                    # pass
-                return False
-            except KeyError:
-                unique[domain]['__0__']+=1
-                unique[domain][host] = 1
-                x = unique[domain]['__0__']
-                if x > 10:
-                    if x%200 == 0:
-                        changes.put([domain, unique[domain]['__0__'], "upd"])
-                    elif x<200 and x%20 == 0:
-                        changes.put([domain, unique[domain]['__0__'], "upd"])
-                else:
-                    changes.put([domain, unique[domain]['__0__'], "upd"])
-                    # pass
-                return False
-        else:
-            unique[domain] = {'__0__':1}
-            unique[domain][host] = 1  # new element
-            changes.put([domain, unique[domain]['__0__'],"new"])
-            return True
-
-
-def is_valid_url(url):
+def isValidURL(url):
     regex = ("((http|https)://)(www.)?" +
              "[a-zA-Z0-9@:%._\\+~#?&//=]" +
              "{2,256}\\.[a-z]" +
@@ -100,6 +59,49 @@ def is_valid_url(url):
         return True
     else:
         return False
+
+
+
+
+def updateChanger(url):
+    # url is already validated
+    global unique
+    link = urlparse(url)
+    domain = link.netloc
+    host = link.path
+
+    if unique.get(domain):
+        # if the domain is already present in the dictionary
+        if (unique[domain].get(host)):
+            unique[domain][host] +=1
+        else:
+            unique[domain][host] = 1
+
+        
+        unique[domain]['__0__'] += 1 # number of urls of a given domain + 1
+        x = unique[domain]['__0__'] # number of unique urls in the domain
+
+        # logic to update the database, after every consecutive change 
+        # until 10, then over 10 every 20 change, and over 200 every
+        # 200 change.
+        # TODO : perform batch update for this logic.
+        if x > 10:
+            if x%200 == 0:
+                changes.put([domain, unique[domain]['__0__'], "upd"])
+            elif x<200 and x%20 == 0:
+                changes.put([domain, unique[domain]['__0__'], "upd"])
+        else:
+            changes.put([domain, unique[domain]['__0__'], "upd"])
+        return False
+
+    else:
+        unique[domain] = {'__0__':1}
+        unique[domain][host] = 1  # new element
+        changes.put([domain, unique[domain]['__0__'],"new"])
+        return True
+
+
+
 
 
 def all_url(root_url):
@@ -121,7 +123,7 @@ def all_url(root_url):
 
         if boolean:
             r = requests.get(root_url, timeout=(3, 5))
-            soup = BeautifulSoup(r.content, 'lxml',from_encoding="iso-8859-1")
+            soup = BeautifulSoup(r.content, 'lxml', from_encoding="iso-8859-1")
             cache_pool.put([soup, root_url])
             fill = soup.findAll('a')
             lst = []
@@ -137,7 +139,8 @@ def all_url(root_url):
                             i = root_url + i[1:]
                         else:
                             i = root_url + i
-                    if check(i):
+                    if isValidURL(i):
+                        updateChanger(i)
                         q.put(i)
                     else:
                         pass
