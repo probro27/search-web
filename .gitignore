@@ -44,3 +44,4 @@ build/Release
 .next
 
 .env
+.vscode
