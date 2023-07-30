@@ -15,8 +15,10 @@ import indexer
 from threading import Thread
 import pprint
 import changer
-# from numba import jit, cuda
-# import lxml before running
+import os
+from dotenv import load_dotenv
+load_dotenv() 
+
 
 # make a cache pool(temporary storage) which stores the html tags of the website. We keep this so that the indexer can access it and do text analysis.
 # instead of uniques we make a cash pools.
@@ -24,27 +26,24 @@ q = Queue(maxsize=0)
 changes = Queue(maxsize=0)
 cache_pool = Queue(maxsize=10000)
 unique = dict()
-# client = MongoClient('mongodb+srv://admin:password1234$@web-map.qzzvr.mongodb.net/myFirstDatabase?retryWrites=true&w=majority')
-# client = MongoClient('mongodb://localhost:27017/')
 
+if os.environ.get('ENVIRONMENT') == "dev":
+    client = MongoClient('mongodb://localhost:27017/')
+else:
+    client = MongoClient(os.environ.get('ATLAS_URI'))
 
+db = client["web-map"]
+collection = db["seed-url"]
 
-root_url = ["https://en.wikipedia.org/wiki/Fast_Fourier_transform", "https://www.bbc.com/",
-            "https://www.facebook.com", "https://www.google.com/search/howsearchworks/crawling-indexing/", "https://ca.yahoo.com/?p=us&guccounter=1"]
-root_url=["http://localhost:8000"]
+root_url = collection.find({"status": "pending"})
+
+# root_url = ["https://en.wikipedia.org/wiki/Fast_Fourier_transform", "https://www.bbc.com/",
+#             "https://www.facebook.com", "https://www.google.com/search/howsearchworks/crawling-indexing/", "https://ca.yahoo.com/?p=us&guccounter=1"]
+# root_url=["http://localhost:8000"]
 for i in root_url:
     q.put(i)
-# import csv
 
-# with open('seed_url.csv', newline='') as f:
-#     reader = csv.reader(f)
-#     root_url = ["https://"+row[0] for row in reader]
-# # print(data)
-# # print(1+"aa")
-# for i in root_url:
-#     q.put(i)
 
-# q.put(root_url[1])
 
 
 start_time = time.time()
@@ -52,14 +51,12 @@ seconds = 120
 words = dict()
 
 
-# @jit(target="cuda")
 def check(url):
     global unique
     if is_valid_url(url):
         link = urlparse(url)
         domain = link.netloc
         host = link.path
-        # print(url)
         if unique.get(domain):
             try:
                 unique[domain][host] +=1
@@ -89,7 +86,6 @@ def check(url):
                 return False
         else:
             unique[domain] = {'__0__':1}
-            # temp_dict = {host: 1}
             unique[domain][host] = 1  # new element
             changes.put([domain, unique[domain]['__0__'],"new"])
             return True
@@ -114,26 +110,17 @@ def all_url(root_url):
 
     try:
         link = urlparse(root_url)
-        # print("1")
         domain = link.netloc
-        # print("domain")
         scheme = link.scheme
-        # print("scheme")
         combined_str = scheme + '://' + domain + '/robots.txt'
-        # print(combined_str)
         rp = Robot.RobotFileParser()
         rp.set_url(combined_str)
-        # print("hello")
         try:
-            # print("his")
             rp.read()
-            # print("how")
             boolean = rp.can_fetch("*",root_url)
         except:
-            # print("helloo")
             boolean=True
-        # print("4")
-        # print(boolean)
+
         if boolean:
             r = requests.get(root_url, timeout=(3, 5))
             # print(r)
@@ -174,9 +161,6 @@ def all_url(root_url):
 
 
 def print_results():
-    # pp = pprint.PrettyPrinter(indent=4)
-    # pp.pprint(unique)
-    # print(len(unique))
     print("queue size :"+str(q.qsize()))
     print("memory :"+str(sys.getsizeof(unique)))
     print("cachepool :"+str(cache_pool.qsize()))
@@ -201,8 +185,6 @@ def main_init():
             print('domains crawled : %10s %1s'%(str(len(unique)),"/"),end="\r")
             print('domains crawled : %10s %1s'%(str(len(unique)),"-"),end="\r")
 
-            # print(str(len(unique))+"   /",end="\r")
-            # print(str(len(unique))+"   -",end="\r")
 
 
 def indexing():
@@ -234,16 +216,6 @@ def changing():
             pass
             # print("Cache pool empty")
 
-# def pooling():
-#     pool_size = 100  # your "parallelness"
-
-#     pool = Pool(pool_size)
-
-#     for i in range(pool_size):
-#         pool.apply_async(indexing,( ))
-#         pool.apply_async(main_init, ( ))
-    # pool.close()
-    # pool.join()
 num_threads = 1
 threads = []
 for i in range(num_threads):
