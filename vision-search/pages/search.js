@@ -17,13 +17,14 @@ export default function Search(){
     useEffect(()=> axios.get('http://127.0.0.1:5000/api/search',{ params }).then((response) => {
         console.log(response.data)
         setPost(response.data);
+        console.log(post);
       }),[]);
     return (
         <div className="flex flex-col ml-96 my-32 justify-center text-left">
             <h1 className="text-5xl font-lg font-mono leading-tight text-blue-400">Results</h1>
             {/* <ol> */}
-                {post.map((x)=>{
-                    return <div className="text-white my-4 text-xl" key="1"><a href={x[0]}>{x[0]}</a></div>
+                {post.map((x, index)=>{
+                    return <div className="text-white my-4 text-xl" key={index}><a href={x[0]}>{x[0]}</a></div>
                 })}
             {/* </ol> */}
         </div>

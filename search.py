@@ -13,14 +13,8 @@ x = db['tags']
 
 import csv
 
-# x.update_one(
-#    filter= { "word": "play" },
-#    update= { "$addToSet": { "9" : "https://www.youtube.com/" }},
-#    upsert=True,
-# )
-# time
 words = ["scraping","error"]
-# z = x.find({ "word": { "$in": words }})
+
 z = y.find({'count': {"$gt":0}})
 count=0
 for i in z:
@@ -29,38 +23,3 @@ for i in z:
 end=time.now()
 print(count)
 print(end-start)
-# with open('seed_url.csv', newline='') as f:
-#     reader = csv.reader(f)
-#     url = [row[0] for row in reader]
-
-# z = x.find({ "url": { "$in": url }})
-# rank={}
-# # id = []
-# def lijst(x):
-#     return sorted(x.items(), key=lambda x: x[1],reverse=True)
-# for i in z:
-#     # id.append(i['_id'])
-#     rank[i['url']] = i['count']
-# print(len(lijst(rank)))
-# # print(id)
-# end=time.now()
-# print(end-start)
-# # for i in url:
-# #     start = time.now()
-# #     z = x.find_one({'url':url})
-# #     end = time.now()
-# #     timed = end-start
-# #     list_time.append(timed)
-# #     print(timed)
-# # print(np.mean(list_time))
-# # start = time.now()
-# # z = x.find_one({'url':"www.amazon.com"})
-# # end = time.now()
-# # print(end-start)
-# # start=time.now()
-# # y = x.find_one({'_id': ObjectId('61d8ed66b3de40c44097e066')})
-# # end=time.now()
-# # print(end-start)
-# # print(y)
-# # print(z)
-

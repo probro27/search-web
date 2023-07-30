@@ -42,12 +42,20 @@ catch(e){
 // Specifying cors policy for frontend access.
 // update to match the domain you will make the request from
 // Middleware
+// app.use(function(req, res, next) {
+//     res.header("Access-Control-Allow-Origin", "https://vision-frontend.herokuapp.com"); 
+//     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+//     res.header('Access-Control-Allow-Methods', 'GET');
+//     next();
+//   })
+
 app.use(function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "https://vision-frontend.herokuapp.com"); 
+    res.header("Access-Control-Allow-Origin", "http://localhost:3000"); 
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     res.header('Access-Control-Allow-Methods', 'GET');
     next();
   })
+
 
 
 // The infamous Merge sort by HydroxyHelium
@@ -135,6 +143,7 @@ async function getData(wordList, dbWordTags, dbDomainCount, res, pageNumber) {
 
 app.get('/api/search', async (req, res)=>{
     // Extracting Parameters from request
+    console.log(req.query)
     const searchQuery = req.query.search;
     const pageNumber = req.query.page;
 
