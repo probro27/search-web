@@ -158,6 +158,33 @@ app.get('/api/search', async (req, res)=>{
 })
 
 
+app.get('/api/requestCrawl', async (req, res)=>{
+    const url = req.query.url;
+    var dbConn = client.db("web-map");
+    
+    // check if the url already exists in the database
+    let dbResult = await dbConn.collection("seed-url").find({'url':url}).toArray()
+    if (dbResult.length > 0){
+        // if it exists, update the status to pending
+        dbConn.collection("seed-url").updateOne({'url':url},{$set:{'status':'pending'}})
+        res.send("Successfully requested to crawl again");
+        return;
+    }
+    
+    urlObject = {
+        'url':url,
+        'status':'pending',
+        'depth':100,
+        'parent':'',
+        'dateAdded': new Date(),
+        // 'lastCrawled': , // add this later
+    }
+    dbConn.collection("seed-url").insertOne(urlObject)
+    res.send("Crawl Requested Successfully")
+    return;
+})
+
+
 
 
 app.use(cors());
