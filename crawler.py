@@ -22,6 +22,7 @@ load_dotenv()
 
 # make a cache pool(temporary storage) which stores the html tags of the website. We keep this so that the indexer can access it and do text analysis.
 # instead of uniques we make a cash pools.
+
 q = Queue(maxsize=0)
 changes = Queue(maxsize=0)
 cache_pool = Queue(maxsize=10000)
@@ -37,9 +38,6 @@ collection = db["seed-url"]
 
 root_url = collection.find({"status": "pending"})
 
-# root_url = ["https://en.wikipedia.org/wiki/Fast_Fourier_transform", "https://www.bbc.com/",
-#             "https://www.facebook.com", "https://www.google.com/search/howsearchworks/crawling-indexing/", "https://ca.yahoo.com/?p=us&guccounter=1"]
-# root_url=["http://localhost:8000"]
 for i in root_url:
     q.put(i)
 
@@ -123,12 +121,10 @@ def all_url(root_url):
 
         if boolean:
             r = requests.get(root_url, timeout=(3, 5))
-            # print(r)
             soup = BeautifulSoup(r.content, 'lxml',from_encoding="iso-8859-1")
             cache_pool.put([soup, root_url])
             fill = soup.findAll('a')
             lst = []
-            # print(fill)
             for i in fill:
                 lst.append(i.get('href'))
 
@@ -142,18 +138,15 @@ def all_url(root_url):
                         else:
                             i = root_url + i
                     if check(i):
-                        # print(i)
                         q.put(i)
                     else:
                         pass
                 else:
                     pass
         else: 
-            # print('not allowed')
             pass
     except:
         pass
-        # print("e")
 
     
 
@@ -171,13 +164,11 @@ def main_init():
     while True:
         current_time = time.time()
         elapsed_time = current_time - start_time
-        # print(int(elapsed_time),end='\r')
         if elapsed_time > seconds:
             break
 
         if q.empty():
             pass
-            # print("Empty")
         else:
             
             all_url(q.get())
