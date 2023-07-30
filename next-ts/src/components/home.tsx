@@ -4,10 +4,6 @@ import { Link } from "react-router-dom";
 function Home() {
   const [query, setQuery] = useState<string>("");
 
-  const onRecrawlRequest = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    e.preventDefault();
-    console.log((e.target as HTMLButtonElement).value);
-  };
   function onChange(e: React.ChangeEvent<HTMLInputElement>) {
     console.log((e.target as HTMLButtonElement).value);
     setQuery(e.target.value);
