@@ -45,3 +45,4 @@ build/Release
 
 .env
 .vscode
+venv
