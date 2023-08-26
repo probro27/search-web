@@ -21,14 +21,15 @@ else:
 db = client["web-map"]
 db.tags.create_index("word", unique=True)
 
+
 def bodyClean(body):
     body = str(body)
     CLEANR = re.compile(r"<[^>]*>")
     cleantext = CLEANR.sub("", body)
     ## uncomment this while running for first time ....
-    nltk.download('omw-1.4')
-    nltk.download('wordnet')
-    nltk.download('stopwords')
+    nltk.download("omw-1.4")
+    nltk.download("wordnet")
+    nltk.download("stopwords")
     stopwords = nltk.corpus.stopwords.words("english")
     lemmatizer = WordNetLemmatizer()
     doc = re.sub("[^a-zA-Z]", " ", cleantext)
@@ -38,9 +39,16 @@ def bodyClean(body):
     doc = " ".join(doc)
     return doc
 
+
 def term_frequency(term, body):
     normalized_document = body.lower().split()
+    term_count = normalized_document.count(term.lower())
+    # building the word count collection
+    db["word-count"].update_one(
+        {"word": term}, {"$inc": {"count": term_count}}, upsert=True
+    )
     return normalized_document.count(term.lower()) / float(len(normalized_document))
+
 
 def compute_normalizedtf(document):
     sentence = document.lower().split()
@@ -48,7 +56,11 @@ def compute_normalizedtf(document):
     for word in sentence:
         norm_tf[word] += term_frequency(word, document)
     tf_doc.append(norm_tf)
-    
+
+
 def htmlparse(soup, url):
+    db["metadata"].update_one(
+        {"documents": "urls"}, {"$inc": {"count": 1}}, upsert=True
+    )
     body = soup.find("body")
     compute_normalizedtf(bodyClean(body))
