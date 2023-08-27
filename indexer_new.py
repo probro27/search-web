@@ -88,6 +88,23 @@ def htmlparse(soup, url):
     db["metadata"].update_one(
         {"documents": "urls"}, {"$inc": {"count": 1}}, upsert=True
     )
-    
+
     body = soup.find("body")
     compute_normalizedtf(bodyClean(body), url)
+
+
+def createWeightMatrix():
+    """Creates the weight matrix for the documents in the database.
+    """
+    import numpy as np
+    db['docs-per-word']
+    normalized_tf = db['normalized-tf'].find()
+    number_docs = db["normalized-tf"].count_documents({})
+    vector_dimention = db['docs-per-word'].count_documents({})
+    matrix = np.array(number_docs, vector_dimention)
+    for i in normalized_tf :
+        for j in i['normalized-tf']:
+            # matrix[i][  ] = i['normalized-tf'][j] * math.log(number_docs/db['docs-per-word'].find_one({"word": j})['count'])
+        
+    
+    
