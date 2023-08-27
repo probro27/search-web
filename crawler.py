@@ -130,7 +130,7 @@ def all_url(root_url):
 
             for i in lst:
                 if i:
-                    regex1 = "(^\/[a-zA-Z*%$!)(\/&*]*)"
+                    regex1 = ("(^\/[a-zA-Z*%$!)(\/&*]*)") # regex to check if the url is relative or not
                     p1 = re.compile(regex1)
                     if re.search(p1, i):
                         if root_url[-1] == "/":
