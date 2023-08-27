@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 from nltk.stem import WordNetLemmatizer
 from pymongo import MongoClient
+import numpy as np
 
 import re
 import nltk
@@ -22,7 +23,7 @@ db = client["web-map"]
 db.tags.create_index("word", unique=True)
 
 
-def bodyClean(body):
+def bodyClean(body: str) -> str:
     """Used to clean the body of the html page, and get rid of the unnnecessary tags and punctuations.
 
     Args:
@@ -30,7 +31,7 @@ def bodyClean(body):
 
     Returns:
         str: set of words in the body of the html page, parsed as tokens and seperated by space.
-    """    
+    """
     body = str(body)
     CLEANR = re.compile(r"<[^>]*>")
     cleantext = CLEANR.sub("", body)
@@ -48,43 +49,46 @@ def bodyClean(body):
     return doc
 
 
-def term_frequency(term, body):
+def term_frequency(term: str, body: str) -> float:
+    """Used to calculate the term frequency of a term in a document.
+    
+    Args:
+        term (str): term to be searched for in the document
+        body (str): body of the document
+    
+    Returns:
+        float: term frequency of the term in the document
+    """
     normalized_document = body.lower().split()
     term_count = normalized_document.count(term.lower())
-    
-    #TODO remove this. Probably not needed.
-    # building the word count collection
-    db["word-count"].update_one(
-        {"word": term}, {"$inc": {"count": term_count}}, upsert=True
-    )
 
     # number of documents containing, update in db
-    db['docs-per-word'].update_one(
-        {"word": term}, {"$inc": {"count": 1}}, upsert=True
-    )
+    db["docs-per-word"].update_one({"word": term}, {"$inc": {"count": 1}}, upsert=True)
 
     return term_count / float(len(normalized_document))
 
 
-def compute_normalizedtf(document:str, url:str):
-
+def compute_normalizedtf(document: str, url: str):
+    """Used to compute the normalized term frequency of the document and store it in the database.
+    
+    Args:
+        document (str): body of the document
+        url (str): url of the document
+    """
     sentence = document.lower().split()
     norm_tf = dict.fromkeys(set(sentence), 0)
-    
+
     for word in sentence:
         norm_tf[word] += term_frequency(word, document)
-    
-    doc_object = {
-        "url": url,
-        "normalized-tf": norm_tf
-    }
 
-    db['normalized-tf'].insert_one(doc_object)
+    doc_object = {"url": url, "normalized-tf": norm_tf}
+
+    db["normalized-tf"].insert_one(doc_object)
 
 
-def htmlparse(soup, url):
+def htmlparse(soup, url: str):
 
-    #what is this?
+    # store the total number of documents in the database
     db["metadata"].update_one(
         {"documents": "urls"}, {"$inc": {"count": 1}}, upsert=True
     )
@@ -96,15 +100,13 @@ def htmlparse(soup, url):
 def createWeightMatrix():
     """Creates the weight matrix for the documents in the database.
     """
-    import numpy as np
-    db['docs-per-word']
-    normalized_tf = db['normalized-tf'].find()
+
+    db["docs-per-word"]
+    normalized_tf = db["normalized-tf"].find()
     number_docs = db["normalized-tf"].count_documents({})
-    vector_dimention = db['docs-per-word'].count_documents({})
+    vector_dimention = db["docs-per-word"].count_documents({})
     matrix = np.array(number_docs, vector_dimention)
-    for i in normalized_tf :
-        for j in i['normalized-tf']:
+    for i in normalized_tf:
+        for j in i["normalized-tf"]:
             # matrix[i][  ] = i['normalized-tf'][j] * math.log(number_docs/db['docs-per-word'].find_one({"word": j})['count'])
-        
-    
-    
+            pass
